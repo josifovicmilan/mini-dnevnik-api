@@ -25,4 +25,20 @@ class Subject extends Model
         $subject1->update(['position' => $subject2->position]);
         $subject2->update(['position' => $helperPosition]);
     }
+    
+    public function position(){
+        return $this->morphOne(Position::class, 'positionable');
+    }
+
+    public function addPosition($classroom){
+
+        return $this->position()->create([
+            'positionable_type' => Subject::class,
+            'positionable_id' => $this->id,
+            'classroom_id' => $classroom->id,
+            'position' => Position::max('position') + 1,
+        ]);
+    }
+
+    
 }

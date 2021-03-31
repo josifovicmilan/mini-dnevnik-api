@@ -3,6 +3,7 @@
 namespace Tests\Unit;
 
 use Tests\TestCase;
+use App\Models\User;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Classroom;
@@ -18,7 +19,8 @@ class StudentSubjectTest extends TestCase
     protected $student;
     protected function setUp():void{
         parent::setUp();
-        $this->classroom = Classroom::factory()->create();
+        $this->user = User::factory()->create();
+        $this->classroom = Classroom::factory()->create(['user_id' => $this->user->id]);
         $this->student = Student::factory()->create(['classroom_id' => $this->classroom->id]);
     }
     /**

@@ -24,7 +24,6 @@ class SubjectFactory extends Factory
         return [
             'name' => $this->faker->unique()->randomElement(['Математика', "Српски језик и књижевност", "Физика", "Хемија", "Биологија"]),
             "type" => 'обавезни',
-            "position" => $this->faker->unique()->randomNumber()
         ];
     }
 }

@@ -15,14 +15,14 @@ class CreateClassroomsTable extends Migration
     {
         Schema::create('classrooms', function (Blueprint $table) {
             $table->id();
-            $table->unsignedInteger('year_started');
+            $table->integer('year_started');
             $table->smallInteger('classroom_number');
             $table->smallInteger('duration')->default(4);
             $table->string('type');
             $table->timestamps();
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
 
-
-            $table->unique(['year_started','classroom_number']);
+            $table->unique(['year_started','classroom_number','user_id']);
         });
     }
 

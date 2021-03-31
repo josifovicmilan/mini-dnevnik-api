@@ -1,8 +1,9 @@
 <?php
 
-namespace Tests\Unit;
+namespace Tests\Feature;
 
 use Tests\TestCase;
+use App\Models\User;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Classroom;
@@ -16,11 +17,13 @@ class StudentPrimarySchoolApiTest extends TestCase
 
     protected $classroom;
     protected $student;
+    protected $user;
 
     protected function setUp() : void {
 
         parent::setUp();
-        $this->classroom = Classroom::factory()->create();
+        $this->user = User::factory()->create();
+        $this->classroom = Classroom::factory()->create(['user_id' => $this->user->id]);
         $this->student = Student::factory()->create(['classroom_id' => $this->classroom->id]);
         
     }
@@ -28,8 +31,28 @@ class StudentPrimarySchoolApiTest extends TestCase
     /**
     *@test
     */
+    public function cannot_view_primary_school_information_about_a_student_if_not_authorized_user(){
+    
+        $response = $this->getJson("/api/students/{$this->student->id}/primary-school-data")->assertStatus(401);
+    }
+
+    /**
+    *@test
+    */
+    public function cannot_view_primary_school_information_about_a_student_if_student_does_not_belong_to_a_user(){
+        $this->actingAs($this->user);
+
+        $user = User::factory()->create();
+        $classroom = Classroom::factory()->create(['user_id' => $user->id]);
+        $student = Student::factory()->create(['classroom_id' => $classroom->id]);
+
+        $response = $this->getJson("/api/students/{$student->id}/primary-school-data")->assertStatus(403);
+    }
+    /**
+    *@test
+    */
     public function create_new_primary_school_data_for_a_student_with_valid_data(){
-        
+        $this->actingAs($this->user);
         $language_subject = Subject::factory()->create(['name'=> 'ita']);
         $chosen_subject = Subject::factory()->create(['name'=> 'versko']);
         $packet_subject1 = Subject::factory()->create(['name'=> 'jmk']);
@@ -58,6 +81,7 @@ class StudentPrimarySchoolApiTest extends TestCase
     *@test
     */
     public function fail_to_create_primary_school_data_for_student_if_wront_data_passed_to_gender(){
+        $this->actingAs($this->user);
         $language_subject = Subject::factory()->create(['name'=> 'ita']);
         $chosen_subject = Subject::factory()->create(['name'=> 'versko']);
         $packet_subject1 = Subject::factory()->create(['name'=> 'jmk']);
@@ -82,7 +106,8 @@ class StudentPrimarySchoolApiTest extends TestCase
     *@test
     */
     public function fail_to_create_primary_school_data_for_student_if_data_missing(){
-        
+        $this->actingAs($this->user);
+
         $chosen_subject = Subject::factory()->create(['name'=> 'versko']);
         $packet_subject1 = Subject::factory()->create(['name'=> 'jmk']);
         $packet_subject2 = Subject::factory()->create(['name'=> 'pgd']);
@@ -106,6 +131,7 @@ class StudentPrimarySchoolApiTest extends TestCase
     */
     public function update_primary_school_data_with_valid_data(){
 
+        $this->actingAs($this->user);
 
         $primary_school_data = PrimarySchoolData::factory()->create(['student_id' => $this->student->id]);
            

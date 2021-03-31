@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\User;
 use App\Models\Student;
 use App\Models\Subject;
 use App\Models\Classroom;
@@ -16,10 +17,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $classroom = Classroom::factory()->create();
+        $user = User::factory()->create();
+        $classroom = Classroom::factory()->create(['user_id' => $user->id]);
         $subjects = Subject::factory()->count(3)->create();
         Student::factory()->count(5)->create(['classroom_id' => $classroom->id])->each(function($student) use ($subjects){
             $student->marks()->attach($subjects,['mark' => mt_rand(1,5), 'degree' => 'I']);
         });
+        $user->subjects($subjects, ['position' => mt_rand(100000,100000000)]);
     }
 }

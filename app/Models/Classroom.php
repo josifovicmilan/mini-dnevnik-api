@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Classroom extends Model
 {
@@ -11,9 +12,10 @@ class Classroom extends Model
 
     protected $fillable = ['classroom_number', 'year_started', 'duration','type'];
 
-    public function students(){
-        return $this->hasMany(Student::class);
+    public function user(){
+        return $this->belongsTo(User::class);
     }
+
 
     public function getActiveYearsAttribute(){
         return [
@@ -22,5 +24,23 @@ class Classroom extends Model
             'III' => $this->year_started +2 .'-'. $this->year_started+3,
             'IV' => $this->year_started +3 .'-'. $this->year_started+4,
         ];
+    }
+
+    public function students(){
+        return $this->hasMany(Student::class);
+    }
+
+    public function addStudent($student){
+        return $this->students()->create($student);
+
+    }
+
+    public function subjects(){
+        return $this->belongsToMany(Subject::class)->using(ClassroomSubject::class);
+    }
+
+    public function addSubject($subject){
+        
+        $this->subjects()->attach($subject);
     }
 }

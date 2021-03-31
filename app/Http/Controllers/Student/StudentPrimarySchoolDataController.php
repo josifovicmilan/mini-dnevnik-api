@@ -18,7 +18,9 @@ class StudentPrimarySchoolDataController extends Controller
      */
     public function index(Student $student)
     {
-        //
+        $this->authorize('update', $student);
+
+        return response($student->primarySchool);
     }
 
     /**

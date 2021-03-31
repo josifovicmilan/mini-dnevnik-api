@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Classroom;
 use App\Models\Student;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -25,7 +26,8 @@ class StudentFactory extends Factory
             'first_name' => 'Pera',
             'last_name' => 'Peric',
             'jmbg' => '1234567890123',
-            'fathers_name' => 'Milutin'
+            'fathers_name' => 'Milutin',
+            'classroom_id' => Classroom::inRandomOrder()->first()->id,
         ];
     }
 }

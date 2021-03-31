@@ -2,9 +2,10 @@
 
 namespace App\Http\Resources;
 
+use App\Http\Resources\PositionResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class SubjectResource extends JsonResource
+class UserSubjectResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,10 +15,8 @@ class SubjectResource extends JsonResource
      */
     public function toArray($request)
     {
-        return [
-            'name' => $this->name,
-            'type' => $this->type,
-            'position' => $this->position->position,
-        ];
+
+        return PositionResource::collection($this->whenLoaded('subjects'));
+    
     }
 }

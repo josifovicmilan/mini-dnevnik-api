@@ -16,9 +16,8 @@ class ClassroomController extends Controller
      */
     public function index()
     {
-        $classrooms = Classroom::all();
-
-        return response($classrooms);
+        $this->authorize('viewAny', Classroom::class);
+        return response(auth()->user()->classrooms);
     }
 
     /**
@@ -29,10 +28,8 @@ class ClassroomController extends Controller
      */
     public function store(StoreClassroomRequest $request)
     {
-
-        $classroom = new Classroom;
-
-        $classroom->create($request->validated());
+        $this->authorize('create', Classroom::class);
+        $classroom = auth()->user()->classrooms()->create($request->validated());
 
         return response()->json($classroom);
     }
@@ -46,6 +43,7 @@ class ClassroomController extends Controller
     public function show(Classroom $classroom)
     {
         
+        $this->authorize('view', $classroom);
         return response($classroom);
     }
 
@@ -58,9 +56,11 @@ class ClassroomController extends Controller
      */
     public function update(UpdateClassroomRequest $request, Classroom $classroom)
     {
+        if(auth()->user()->cannot('update', $classroom)){
+            return response(403);
+        }
        
-        $classroom->update($request->validated());
-
+        auth()->user()->classrooms()->update($request->validated());
 
         return response($classroom, 201);
     }
@@ -73,6 +73,9 @@ class ClassroomController extends Controller
      */
     public function destroy(Classroom $classroom)
     {
+        // if(auth()->user()->cannot('update', $classroom)){
+        //     return response(['error' => 'User cannot delete classroom that doesnt belong to him'], 403);
+        // }   
         $classroom->delete();
 
         return response($classroom, 200);

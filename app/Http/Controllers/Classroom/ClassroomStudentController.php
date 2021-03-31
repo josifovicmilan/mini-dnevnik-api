@@ -31,8 +31,10 @@ class ClassroomStudentController extends Controller
      */
     public function store(StoreStudentRequest $request, Classroom $classroom)
     {
-        $student = new Student;
-        $student->create($request->validated() + ['classroom_id' => $classroom->id]);
+       if(auth()->user()->isNot($classroom->user)){
+           return response(['errors' => 'User cannot create a student for this classroom'], 403);
+       }
+        $student = $classroom->addStudent($request->validated() + ['classroom_id' => $classroom->id]);
         
         return response($student);
     }

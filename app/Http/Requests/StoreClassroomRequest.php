@@ -34,7 +34,7 @@ class StoreClassroomRequest extends FormRequest
                                             ->where('year_started', $this->year_started);
                                 })
                             ],
-            'type' => 'required'
+            'type' => 'required',
         ];
     }
 }

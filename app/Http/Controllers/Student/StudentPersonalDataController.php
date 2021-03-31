@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Student;
 use App\Models\Student;
 use App\Models\PersonalData;
 use Illuminate\Http\Request;
-use App\Http\Requests\StorePersonalDataRequest;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StorePersonalDataRequest;
+use App\Http\Requests\UpdateStudentPersonalDataRequest;
+
 class StudentPersonalDataController extends Controller
 {
     /**
@@ -17,6 +19,7 @@ class StudentPersonalDataController extends Controller
      */
     public function index(Student $student)
     {
+        $this->authorize('update', $student);
         return response($student->personalData);
     }
 
@@ -30,9 +33,10 @@ class StudentPersonalDataController extends Controller
      */
     public function store(StorePersonalDataRequest $request, Student $student)
     {
-        $student->personalData()->create($request->validated());
+        $this->authorize('update', $student);
+        $student->savePersonalData($request->validated());
 
-        return response($student);
+        return response($student->personalData);
     }
 
 
@@ -41,12 +45,15 @@ class StudentPersonalDataController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Student  $student
-     * @param  \App\Models\PersonalData  $personalData
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Student $student, PersonalData $personalData)
+    public function update(UpdateStudentPersonalDataRequest $request, Student $student)
     {
-        //
+        $this->authorize('update', $student);
+
+        $student->updatePersonalData($request->validated());
+
+        return response($student->personalData, 201);
     }
 
 
