@@ -16,4 +16,8 @@ class Position extends Model
         return $this->morphTo();
     }
 
+    public function scopeInClassroom($query, $classroom){
+    
+        return $query->where('classroom_id', $classroom);
+    }
 }

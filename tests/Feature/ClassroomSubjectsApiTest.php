@@ -44,8 +44,9 @@ class ClassroomSubjectsApiTest extends TestCase
     /**
     *@test
     */
-    public function user_can_view_subjects_attached_to_his_classroom(){
-        $this->withoutExceptionHandling();
+    public function authorized_user_can_view_subjects_attached_to_his_classroom(){
+
+      $this->withoutExceptionHandling();
         $this->actingAs($this->user);
         $subject = Subject::factory()->create();
         $this->classroom->addSubject($subject);
@@ -61,5 +62,69 @@ class ClassroomSubjectsApiTest extends TestCase
             ]
           ]
         ]);
+    }
+
+    /**
+    *@test
+    */
+    public function authorized_user_can_attach_subject_to_his_classroom(){
+    
+      $this->withoutExceptionHandling();
+      $this->actingAs($this->user);
+
+      $subject = Subject::factory()->create();
+
+      $response = $this->postJson("/api/classrooms/{$this->classroom->id}/subjects",[
+        'subject' => $subject
+      ]);
+
+      $response->assertStatus(200);
+
+      $this->assertCount(1, $this->classroom->subjects()->get());
+
+      $this->assertDatabaseHas('positions', ['positionable_type' => Subject::class, 'positionable_id' => $subject->id, 'classroom_id' => $this->classroom->id]);
+
+    }
+
+
+    /**
+    *@test
+    */
+    public function authorized_user_can_detach_subject_from_his_classroom(){
+      $this->withoutExceptionHandling();
+      $this->actingAs($this->user);
+
+      $subject = Subject::factory()->create();
+
+      $this->classroom->addSubject($subject);
+
+      $this->assertDatabaseHas('classroom_subject', ['classroom_id' => $this->classroom->id, 'subject_id' => $subject->id]);
+      $this->assertDatabaseHas('positions', ['positionable_type' => Subject::class, 'positionable_id'=> $subject->id, 'classroom_id' => $this->classroom->id]);
+      $response = $this->deleteJson("/api/classrooms/{$this->classroom->id}/subjects/{$subject->id}");
+
+      $response->assertStatus(200);
+
+      $this->assertDatabaseMissing('positions', ['positionable_type' => Subject::class, 'positionable_id'=> $subject->id, 'classroom_id' => $this->classroom->id]);
+      $this->assertDatabaseMissing('classroom_subject', ['classroom_id' => $this->classroom->id, 'subject_id' => $subject->id]);
+    }
+
+    /**
+    *@test
+    */
+    public function subject_can_change_position(){
+      $subjects = Subject::factory()->count(5)->create();
+      
+      $this->classroom->addSubjects($subjects);
+
+      $subject1 = Subject::find(1);
+      $subject2 = Subject::find(2);
+      $subject3 = Subject::find(3);
+
+      $subject1->updatePosition($subject3, $this->classroom);
+
+      $this->assertEquals(3, $subject1->fresh()->positions->position);
+      $this->assertEquals(1, $subject2->positions->position);
+      $this->assertEquals(2, $subject3->positions->position);
+    
     }
 }

@@ -20,8 +20,8 @@ class Student extends Model
         return $this->hasOne(PrimarySchoolData::class);
     }
 
-    public function position(){
-        return $this->morphOne(Position::class, 'positionable');
+    public function positions(){
+        return $this->morphMany(Position::class, 'positionable');
     }
 
     public function classroom(){
@@ -48,6 +48,7 @@ class Student extends Model
         foreach($marks as $mark){
             $this->grade($mark->subject_id, $mark->mark , $mark->degree);
         }
+        return $this;
     }
 
     public function showMarks(){

@@ -19,11 +19,13 @@ class StudentObserver
             $student->refresh();
         }
        
-        $student->position()->create([
+        $student->positions()->create([
             'classroom_id'=> $student->classroom->id,
             'positionable_type' => Student::class,
             'positionable_id' => $student->id,
-            'position' => Position::max('position') + 1
+            'position' => Position::where('classroom_id', $student->classroom->id)
+                                    ->where('positionable_type', Student::class)
+                                    ->max('position') + 1
         ]);
     }
 

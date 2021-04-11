@@ -21,7 +21,7 @@ class ClassroomSubjectController extends Controller
     public function index(Classroom $classroom)
     {
         $this->authorize('update', $classroom);
-        return new ClassroomResource($classroom->load('subjects.position'));
+        return new ClassroomResource($classroom->load('subjects.positions'));
     }
 
     /**
@@ -33,32 +33,12 @@ class ClassroomSubjectController extends Controller
      */
     public function store(Request $request, Classroom $classroom)
     {
-        //
-    }
+        $this->authorize('update', $classroom);
+        
+        $subject = Subject::find($request->subject["id"]);
+        $classroom->addSubject($subject);
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Classroom  $classroom
-     * @param  \App\Models\Subject  $subject
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Classroom $classroom, Subject $subject)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Classroom  $classroom
-     * @param  \App\Models\Subject  $subject
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, Classroom $classroom, Subject $subject)
-    {
-        //
+        return response($classroom);
     }
 
     /**
@@ -70,6 +50,9 @@ class ClassroomSubjectController extends Controller
      */
     public function destroy(Classroom $classroom, Subject $subject)
     {
-        //
+        $this->authorize('update', $classroom);
+        $classroom->removeSubject($subject);
+
+        return response($classroom);
     }
 }

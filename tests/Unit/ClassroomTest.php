@@ -63,9 +63,8 @@ class ClassroomTest extends TestCase
     /**
     *@test
     */
-    public function classroom_has_its_subjects(){
+    public function subject_can_be_added_to_a_classroom(){
     
-        $this->withoutExceptionHandling();
         $user = User::factory()->create();
         $classroom = Classroom::factory()->create(['user_id' => $user->id]);
 
@@ -76,6 +75,24 @@ class ClassroomTest extends TestCase
         $this->assertCount(1, $classroom->subjects);
     }
 
+
+    /**
+    *@test
+    */
+    public function subjects_can_be_removed_from_a_classroom(){
+    
+        $user = User::factory()->create();
+        $classroom = Classroom::factory()->create(['user_id' => $user->id]);
+        $subject = Subject::factory()->create();
+        $classroom->addSubject($subject);
+        $this->assertCount(1, $classroom->subjects);
+
+        $classroom->removeSubject($subject);
+        
+        $this->assertCount(0, $classroom->fresh()->subjects);
+        $this->assertDatabaseMissing('classroom_subject', ['subject_id' => $subject->id, 'classroom_id' => $classroom->id]);
+        $this->assertDatabaseMissing('positions', ['positionable_type' => Subject::class, 'positionable_id' => $subject->id, 'classroom_id' => $classroom->id]);
+    }
     /**
     *@test
     */
@@ -88,7 +105,7 @@ class ClassroomTest extends TestCase
 
         $classroom->addSubject($subject);
 
-        $this->assertCount(1, $subject->position()->get());
+        $this->assertCount(1, $subject->positions()->get());
     }
 
     /**
@@ -106,4 +123,27 @@ class ClassroomTest extends TestCase
         $this->assertCount(1, $classroom->students);
 
     }
+
+    /**
+    *@test
+    */
+    public function many_subjects_can_be_added_to_classroom(){
+        $user = User::factory()->create();
+        $classroom = Classroom::factory()->create(['user_id' => $user->id]);
+
+        $subjects = Subject::factory()->count(2)->create();
+
+        $this->assertCount(2, $subjects);
+
+
+        $this->assertEmpty($classroom->subjects);
+
+        $classroom->addSubjects($subjects);
+
+        
+        $this->assertCount(2, $classroom->fresh()->subjects);
+    }
+
+
+
 }

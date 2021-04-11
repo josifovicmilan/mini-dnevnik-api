@@ -12,13 +12,13 @@ class Subject extends Model
     protected $guarded = [];
     
 
-    public function next(){
-        return Subject::where('position', '>', $this->position)->orderBy('position', 'asc')->first();
-    }
+    // public function next(){
+    //     return Subject::where('position', '>', $this->position)->orderBy('position', 'asc')->first();
+    // }
 
-    public function prev(){
-        return Subject::where('position', '<', $this->position)->orderBy('position', 'asc')->first();
-    }
+    // public function prev(){
+    //     return Subject::where('position', '<', $this->position)->orderBy('position', 'asc')->first();
+    // }
 
     public static function swap(Subject $subject1, Subject $subject2){
         $helperPosition = $subject1->position;
@@ -26,13 +26,13 @@ class Subject extends Model
         $subject2->update(['position' => $helperPosition]);
     }
     
-    public function position(){
-        return $this->morphOne(Position::class, 'positionable');
+    public function positions(){
+        return $this->morphMany(Position::class, 'positionable');
     }
 
     public function addPosition($classroom){
 
-        return $this->position()->create([
+        return $this->positions()->create([
             'positionable_type' => Subject::class,
             'positionable_id' => $this->id,
             'classroom_id' => $classroom->id,
@@ -40,5 +40,15 @@ class Subject extends Model
         ]);
     }
 
+
+    public function updatePosition($subject){
+
+        
+        //dd(gettype($this->positions()));//->first()->position); //->get()->toArray());
+        $this->positions()->inClassroom($this->pivot->classroom_id)->first()->update([
+            'position' => $subject->positions()->inClassroom($this->pivot->classroom_id)->first()->position
+        ]);
+        return $this;
+    }
     
 }

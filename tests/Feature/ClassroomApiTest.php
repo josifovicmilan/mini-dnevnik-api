@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use Tests\TestCase;
 use App\Models\User;
+use App\Models\Student;
 use App\Models\Classroom;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
@@ -217,4 +218,58 @@ class ClassroomApiTest extends TestCase
         $response->assertStatus(401);
     }
 
+    /**
+    *@test
+    */
+    public function fail_to_delete_classroom_if_not_authorized(){
+    
+        $classroom = Classroom::factory()->create(['user_id' => $this->user->id]);
+
+        $this->deleteJson("/api/classrooms/{$classroom->id}")->assertStatus(401);
+
+
+        $this->assertDatabaseHas('classrooms', ['id' => $classroom->id]);
+
+    }
+
+
+    /**
+    *@test
+    */
+    public function fail_to_delete_classroom_if_not_belong_to_user(){
+    
+        $classroom = Classroom::factory()->create(['user_id' => $this->user->id]);
+
+        $user = User::factory()->create();
+        $this->actingAs($user);
+        $this->deleteJson("/api/classrooms/{$classroom->id}")->assertStatus(403);
+    }
+
+    /**
+     * @test
+     */
+    public function authorized_user_can_delete_classroom_that_belongs_to_him(){
+    
+        $classroom = Classroom::factory()->create(['user_id' => $this->user->id]);
+        $this->actingAs($this->user);
+
+        $this->deleteJson("/api/classrooms/{$classroom->id}");
+
+        $this->assertDatabaseMissing('classrooms', ['id' => $classroom->id]);
+    }
+
+    /**
+    *@test
+    */
+    public function deleting_classroom_deletes_sets_null_to_associated_students(){
+    
+        $classroom = Classroom::factory()->create(['user_id' => $this->user->id]);
+        $student = Student::factory()->create(['classroom_id' => $classroom->id]);
+        $this->actingAs($this->user);
+
+        $this->deleteJson("/api/classrooms/{$classroom->id}");
+
+        $this->assertDatabaseMissing('classrooms', ['id' => $classroom->id]);
+        $this->assertDatabaseHas('students', ['id' => $student->id, 'classroom_id' => null]);
+    }
 }

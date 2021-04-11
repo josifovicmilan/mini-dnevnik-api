@@ -73,9 +73,7 @@ class ClassroomController extends Controller
      */
     public function destroy(Classroom $classroom)
     {
-        // if(auth()->user()->cannot('update', $classroom)){
-        //     return response(['error' => 'User cannot delete classroom that doesnt belong to him'], 403);
-        // }   
+        $this->authorize('update', $classroom);
         $classroom->delete();
 
         return response($classroom, 200);

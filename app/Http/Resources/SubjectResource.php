@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class SubjectResource extends JsonResource
@@ -17,7 +18,7 @@ class SubjectResource extends JsonResource
         return [
             'name' => $this->name,
             'type' => $this->type,
-            'position' => $this->position->position,
+            'position' => PositionResource::collection($this->whenLoaded('positions'))
         ];
     }
 }

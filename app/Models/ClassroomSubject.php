@@ -16,14 +16,28 @@ class ClassroomSubject extends Pivot
         parent::boot();
 
         static::saved(function($classroomSubject){
-            $subject = Subject::find($classroomSubject->subject_id)->first();
-            $position = Position::max('position');
             Position::create([
                 'positionable_type' => Subject::class,
-                'positionable_id' => $subject->id,
+                'positionable_id' => $classroomSubject->subject_id,
                 'classroom_id' => $classroomSubject->classroom_id,
-                'position' => $position + 1
+                'position' => Position::where('classroom_id', $classroomSubject->classroom_id)
+                                        ->where('positionable_type', Subject::class)
+                                        ->max('position') + 1
             ]);
+        });
+
+        static::deleted(function($classroomSubject){
+
+            $position = Position::where('positionable_type', Subject::class)
+                                ->where('positionable_id', $classroomSubject->subject_id)
+                                ->where('classroom_id', $classroomSubject->classroom_id)->first();
+        
+            $position->delete();
+        });
+
+        static::updated(function($classroomSubject){
+            $positions = Position::where('classroom_id', $classroomSubject->classroom_id);
+            dd($positions);
         });
     }
 }

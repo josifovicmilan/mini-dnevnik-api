@@ -14,6 +14,17 @@ class SubjectTest extends TestCase
 {
 
     use RefreshDatabase;
+
+    protected $user;
+    protected $classroom;
+
+    protected function setUp() : void{
+        parent::setUp();
+
+        $this->user = User::factory()->create();
+        $this->classroom = Classroom::factory()->create(['user_id' => $this->user->id]);
+
+    }
      /**
     *@test
     */
@@ -76,13 +87,15 @@ class SubjectTest extends TestCase
     */
     public function subject_can_have_position_in_a_classroom(){
     
-        $user = User::factory()->create();
-        $classroom = Classroom::factory()->create(['user_id' => $user->id]);
+        
         $subject = Subject::factory()->create();
 
-        $subject->addPosition($classroom);
+        $subject->addPosition($this->classroom);
         
-        $this->assertCount(1, $subject->position()->get());
+        $this->assertCount(1, $subject->positions()->get());
         
     }
+
+
+
 }

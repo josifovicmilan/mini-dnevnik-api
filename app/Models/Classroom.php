@@ -41,6 +41,16 @@ class Classroom extends Model
 
     public function addSubject($subject){
         
-        $this->subjects()->attach($subject);
+        return $this->subjects()->attach($subject);
+    }
+    public function addSubjects($subjects){
+        foreach ($subjects as $subject) {
+            $this->addSubject($subject);
+        }
+        return $this;
+    }
+    public function removeSubject($subject)
+    {
+        return $this->subjects()->detach($subject);
     }
 }
