@@ -13,6 +13,7 @@ use App\Http\Controllers\Subject\SubjectSubjectController;
 use App\Http\Controllers\Classroom\ClassroomImportController;
 use App\Http\Controllers\Classroom\ClassroomStudentController;
 use App\Http\Controllers\Classroom\ClassroomSubjectController;
+use App\Http\Controllers\LoginController;
 use App\Http\Controllers\Student\StudentPersonalDataController;
 use App\Http\Controllers\Student\StudentPrimarySchoolDataController;
 
@@ -30,7 +31,9 @@ use App\Http\Controllers\Student\StudentPrimarySchoolDataController;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
-
+Route::post('users/login',[LoginController::class, 'login']);
+Route::post('users/logout',[LoginController::class, 'logout'])->middleware('auth:sanctum');
+Route::get('users/info',[LoginController::class, 'info'])->middleware('auth:sanctum');
 
 Route::middleware('auth:sanctum')->group(function(){
     //CLASSROOMS

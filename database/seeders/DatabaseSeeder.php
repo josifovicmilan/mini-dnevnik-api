@@ -18,11 +18,12 @@ class DatabaseSeeder extends Seeder
     public function run()
     {
         $user = User::factory()->create();
+        $user2= User::factory()->admin()->create(['email' => 'admin@test.com']);
         $classroom = Classroom::factory()->create(['user_id' => $user->id]);
         $subjects = Subject::factory()->count(3)->create();
         Student::factory()->count(5)->create(['classroom_id' => $classroom->id])->each(function($student) use ($subjects){
             $student->marks()->attach($subjects,['mark' => mt_rand(1,5), 'degree' => 'I']);
         });
-        $user->subjects($subjects, ['position' => mt_rand(100000,100000000)]);
+        
     }
 }
