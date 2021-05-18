@@ -54,4 +54,18 @@ class ClassroomStudentController extends Controller
         return response($student, 201);
     }
 
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Classroom  $classroom
+     * @param  \App\Models\Student  $student
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Classroom $classroom, Student $student){
+        if(auth()->user()->isNot($classroom->user)){
+            return response(['errors' => 'User cannot delete a student for this classroom'], 403);
+        }
+        $student->delete();
+        return response($student, 200);
+    }
 }

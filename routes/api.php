@@ -38,7 +38,7 @@ Route::get('users/info',[LoginController::class, 'info'])->middleware('auth:sanc
 Route::middleware('auth:sanctum')->group(function(){
     //CLASSROOMS
     Route::apiResource('classrooms', ClassroomController::class);
-    Route::apiResource('classrooms.students', ClassroomStudentController::class)->only(['index','update', 'store']);
+    Route::apiResource('classrooms.students', ClassroomStudentController::class)->only(['index','update', 'store', 'destroy']);
     Route::apiResource('classrooms.subjects', ClassroomSubjectController::class)->only(['index', 'store', 'destroy']);
     Route::post('classrooms/import', [ClassroomImportController::class, 'store']);
     //SUBJECTS

@@ -28,6 +28,7 @@ class ClassroomController extends Controller
      */
     public function store(StoreClassroomRequest $request)
     {
+       
         $this->authorize('create', Classroom::class);
         $classroom = auth()->user()->classrooms()->create($request->validated());
 
