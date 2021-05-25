@@ -38,7 +38,7 @@ class ClassroomSubjectController extends Controller
         $subject = Subject::find($request->subject["id"]);
         $classroom->addSubject($subject);
 
-        return response($classroom);
+        return response($subject);
     }
 
     /**

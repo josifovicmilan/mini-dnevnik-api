@@ -19,6 +19,17 @@ class LoginController extends Controller
         
         return response(['token' => auth()->user()],200);
     }
+    public function register(Request $request){
+        $this->validate($request, [
+            'name' => 'required',
+            'email' => 'required|email|unique:users,email',
+            'password' =>'required|confirmed|min:6'
+        ]);
+
+        $user = new User;
+        
+        return response($user->create($request->only('name','email','password')));
+    }
     // public function logout(Request $request)
     // {
     //     Auth::logout();

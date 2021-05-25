@@ -32,9 +32,11 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 Route::post('users/login',[LoginController::class, 'login']);
+Route::post('users/register',[LoginController::class, 'register']);
 Route::post('users/logout',[LoginController::class, 'logout'])->middleware('auth:sanctum');
 Route::get('users/info',[LoginController::class, 'info'])->middleware('auth:sanctum');
 
+Route::apiResource('subjects', SubjectController::class);
 Route::middleware('auth:sanctum')->group(function(){
     //CLASSROOMS
     Route::apiResource('classrooms', ClassroomController::class);
@@ -44,7 +46,6 @@ Route::middleware('auth:sanctum')->group(function(){
     //SUBJECTS
     Route::post('/subjects/import', [SubjectImportController::class, 'store']);
     Route::patch('subjects/{subject1}/subjects/{subject2}', [SubjectSubjectController::class, 'update']);
-    Route::apiResource('subjects', SubjectController::class);
     Route::apiResource('users.subjects', UserSubjectController::class);
     //STUDENTS
     Route::post('students/{student}/primary-school-data', [StudentPrimarySchoolDataController::class, 'store']);

@@ -35,9 +35,8 @@ class SubjectController extends Controller
     {   
         $subject = new Subject;
 
-        $subject->create($request->validated());
-
-        return response($subject);
+        
+        return response($subject->create($request->validated()));
     }
 
     /**
@@ -49,7 +48,7 @@ class SubjectController extends Controller
     public function show(Subject $subject)
     {
         //
-        return response($subject);
+        return response()->json($subject);
     }
 
     /**

@@ -22,7 +22,9 @@ class User extends Authenticatable
         'email',
         'password',
     ];
-
+    public function setPasswordAttribute($password){
+        $this->attributes['password'] = bcrypt($password);
+    }
     /**
      * The attributes that should be hidden for arrays.
      *
