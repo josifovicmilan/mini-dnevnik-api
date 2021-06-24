@@ -41,13 +41,17 @@ class Subject extends Model
     }
 
 
-    public function updatePosition($subject){
+    public function updatePosition($subject,$classroom_id){
 
         
-        //dd(gettype($this->positions()));//->first()->position); //->get()->toArray());
-        $this->positions()->inClassroom($this->pivot->classroom_id)->first()->update([
-            'position' => $subject->positions()->inClassroom($this->pivot->classroom_id)->first()->position
-        ]);
+        //dd($subject->positions()->inClassroom($classroom_id)->first()->position);//->first()->position); //->get()->toArray());
+        $this->positions()
+            ->inClassroom($classroom_id)
+            ->first()
+            ->update([
+                'position' => $subject->positions()->inClassroom($classroom_id)->first()->position
+            ]);
+            
         return $this;
     }
     

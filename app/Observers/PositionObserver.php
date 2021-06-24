@@ -35,7 +35,7 @@ class PositionObserver
         $positionRange = [$position->getOriginal('position') , $position->position ];
         $order = 'asc';
     
-
+        
         $positionsBetween = Position::where('positionable_type', $position->positionable_type)
                                     ->whereBetween('position', $positionRange)
                                     ->where('id','!=' ,$position->id)

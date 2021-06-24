@@ -15,7 +15,7 @@ class ClassroomResource extends JsonResource
      */
     public function toArray($request)
     {
-
-        return SubjectResource::collection($this->whenLoaded('subjects'));
+        return  SubjectResource::collection($this->whenLoaded('subjects'));
+        
     }
 }

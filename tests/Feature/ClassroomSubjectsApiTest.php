@@ -46,19 +46,26 @@ class ClassroomSubjectsApiTest extends TestCase
     */
     public function authorized_user_can_view_subjects_attached_to_his_classroom(){
 
-      $this->withoutExceptionHandling();
+        $this->withoutExceptionHandling();
         $this->actingAs($this->user);
         $subject = Subject::factory()->create();
         $this->classroom->addSubject($subject);
-        $response = $this->getJson("/api/classrooms/{$this->classroom->id}/subjects");
 
 
+        $user = User::factory()->create();
+        $classroom = Classroom::factory()->create(['user_id' => $user->id]);
+        $classroom->addSubject($subject);
+        $this->actingAs($user);
+        $response = $this->getJson("/api/classrooms/{$classroom->id}/subjects");
+
+        dd($response);
         $response->assertStatus(200)
         ->assertJsonStructure([
           'data' => [
             '*' =>[
               'name',
               'type',
+              'position',
             ]
           ]
         ]);
@@ -79,7 +86,7 @@ class ClassroomSubjectsApiTest extends TestCase
       ]);
 
       $response->assertStatus(200);
-
+      
       $this->assertCount(1, $this->classroom->subjects()->get());
 
       $this->assertDatabaseHas('positions', ['positionable_type' => Subject::class, 'positionable_id' => $subject->id, 'classroom_id' => $this->classroom->id]);
@@ -120,11 +127,27 @@ class ClassroomSubjectsApiTest extends TestCase
       $subject2 = Subject::find(2);
       $subject3 = Subject::find(3);
 
-      $subject1->updatePosition($subject3, $this->classroom);
+      $subject1->updatePosition($subject3,$this->classroom->id);
 
-      $this->assertEquals(3, $subject1->fresh()->positions->position);
-      $this->assertEquals(1, $subject2->positions->position);
-      $this->assertEquals(2, $subject3->positions->position);
+      $this->assertEquals(3, $subject1->fresh()->positions()->inClassroom($this->classroom->id)->first()->position);
+      $this->assertEquals(1, $subject2->positions()->inClassroom($this->classroom->id)->first()->position);
+      $this->assertEquals(2, $subject3->positions()->inClassroom($this->classroom->id)->first()->position);
     
+    }
+    /**
+     * @test
+     */
+    public function two_subjects_can_excange_position_api(){
+      $this->withoutExceptionHandling();
+      $subjects = Subject::factory()->count(5)->create();
+      $this->actingAs($this->user);
+      $this->classroom->addSubjects($subjects);
+      $subject1 = Subject::find(1);
+      $subject2 = Subject::find(2);
+      $response = $this->patchJson("/api/subjects/{$subject1->id}/subjects/{$subject2->id}",[
+          'classroom_id' => $this->classroom->id
+      ]);
+      $response->assertStatus(200);
+      $this->assertEquals(1, $subject2->positions()->inClassroom($this->classroom->id)->first()->position);
     }
 }

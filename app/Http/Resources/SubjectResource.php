@@ -2,7 +2,7 @@
 
 namespace App\Http\Resources;
 
-
+use App\Models\Position;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class SubjectResource extends JsonResource
@@ -14,12 +14,19 @@ class SubjectResource extends JsonResource
      * @return array
      */
     public function toArray($request)
-    {
+    {  
+        
+        // dd(Position::where('classroom_id', $this->pivot->classroom_id)->where('positionable_type', "App\Models\Subject")->where('positionable_id', $this->id)->first()->position);
+        
         return [
             'id' => $this->id,
             'name' => $this->name,
             'type' => $this->type,
-            'position' => PositionResource::collection($this->whenLoaded('positions'))
+            'position' => Position::where('classroom_id', $this->pivot->classroom_id)
+                                  ->where('positionable_type',"App\Models\Subject")
+                                  ->where('positionable_id', $this->id)
+                                  ->first()
+                                  ->position
         ];
     }
 }
